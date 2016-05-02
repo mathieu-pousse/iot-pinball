@@ -17,5 +17,8 @@ func main() {
 	flag.Parse()
 	CheckSystem()
 	LoadConfiguration(global.File)
+	log.Println("LED0...")
 	table.init()
+	log.Println("i2c...")
+	table.i2c()
 }
