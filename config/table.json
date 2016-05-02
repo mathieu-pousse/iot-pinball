@@ -1,0 +1,21 @@
+{
+  "name": "first-one",
+  "inputs": [
+    {"name": "startButton", "type": "i2c", "address": "0x20", "pin": "0A"},
+    {"name": "leftButton", "type": "i2c", "address": "0x20", "pin": "0A"},
+    {"name": "rightButton", "type": "i2c", "address": "0x20", "pin": "0A"},
+    {"name": "plungerLane", "type": "i2c", "address": "0x20", "pin": "0A"},
+    {"name": "drain", "type": "i2c", "address": "0x20", "pin": "0A"},
+    {"name": "inlaneLeft", "type": "i2c", "address": "0x20", "pin": "0A"},
+    {"name": "inlaneRight", "type": "i2c", "address": "0x20", "pin": "0A"},
+    {"name": "outlaneLeft", "type": "i2c", "address": "0x20", "pin": "0A"},
+    {"name": "outlaneRight", "type": "i2c", "address": "0x20", "pin": "0A"},
+    {"name": "slamTilt", "type": "i2c", "address": "0x20", "pin": "0A"},
+  ],
+  "outputs": [
+
+  ],
+  "solenoids": [
+
+  ]
+}
