@@ -2,8 +2,9 @@ package main
 
 import (
 	"log"
+	"unsafe"
 	"time"
-
+	"encoding/hex"
 	"github.com/kidoman/embd"
 	_ "github.com/kidoman/embd/host/rpi"
 )
@@ -37,7 +38,7 @@ var table = Hardware{}
 func (hardware *Hardware) init() {
 	log.Println("Configuring hardware...")
 	defer embd.CloseLED()
-	for index := 0; index < 20; index++ {
+	for index := 0; index < 3; index++ {
 		embd.LEDToggle("LED0")
 		time.Sleep(250 * time.Millisecond)
 	}
@@ -57,27 +58,29 @@ func (hardware *Hardware) i2c() {
 		bus.WriteByteToReg(ADDRESS, OLATA, index)
 		time.Sleep(250 * time.Millisecond)
 	}
+	bus.WriteByteToReg(ADDRESS, OLATA, 0)
 }
 
 func (hardware *Hardware) loop() {
 	bus := embd.NewI2CBus(1)
 	defer bus.Close()
 	bus.WriteByteToReg(ADDRESS, IODIRA, 0x80) // input for A7
-	bus.WriteByteToReg(ADDRESS, GPPUA, 0x80)  // enable pull up resistor for A7
+	bus.WriteByteToReg(ADDRESS, GPPUA, 0x80) // enable pull up resistor for A7
+	bytes := make([]byte, 1)
+	time.Sleep(10 * time.Millisecond)
 	counter := 5
+	hardware.direction(0x12)
 	for counter > 0 {
-		value, err := bus.ReadByteFromReg(ADDRESS, GPIOA)
-		if err != nill {
-			log.Fatal("error while reading")
-		}
-		if value&0x80 != 0 {
+		bus.ReadFromReg(ADDRESS, GPIOA, bytes)
+ 		log.Printf("%v %v %s", ADDRESS, GPIOA, hex.EncodeToString(bytes))
+		if bytes[0] != 0 {
 			log.Println("Got a 1 !")
 			counter--
 		}
-		time.Sleep(10 * time.Millisecond)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 
 func (hardware *Hardware) direction(chip byte) {
-
+	log.Printf("%v", uintptr(unsafe.Pointer(&chip)))
 }
