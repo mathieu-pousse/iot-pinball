@@ -34,14 +34,14 @@ func (hardware *Hardware) i2c() {
 	defer bus.Close()
 	bus.WriteByteToReg(ADDRESS, IODIRA, 0x80)
 	bus.WriteByteToReg(ADDRESS, GPPUA, 0x80)
-
-	for index := 0; index < 7; index++ {
+	var index byte = 0
+	for ; index < 7; index++ {
 		bus.WriteByteToReg(ADDRESS, OLATA, index)
 		time.Sleep(250 * time.Millisecond)
 	}
 
 }
 
-func (hardware *Hardware) direction(chip byte, ) {
+func (hardware *Hardware) direction(chip byte) {
 
 }
