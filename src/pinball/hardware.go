@@ -23,10 +23,12 @@ var table = Hardware{}
 func (hardware *Hardware) init() {
 	log.Println("Configuring hardware...")
 	defer embd.CloseLED()
-	for {
+        embd.LEDToggle("LED0")
+        time.Sleep(250 * time.Millisecond)
+	for index := 0; index < 20; index++ {
 		embd.LEDToggle("LED0")
-		time.Sleep(250 * time.Millisecond)
 	}
+	time.Sleep(2500 * time.Millisecond)
 }
 
 func (hardware *Hardware) i2c() {
@@ -34,10 +36,12 @@ func (hardware *Hardware) i2c() {
 	defer bus.Close()
 	bus.WriteByteToReg(ADDRESS, IODIRA, 0x80)
 	bus.WriteByteToReg(ADDRESS, GPPUA, 0x80)
+	bus.WriteByteToReg(ADDRESS, OLATA, 0x00)
+        time.Sleep(250 * time.Millisecond)
 	var index byte = 0
 	for ; index < 7; index++ {
 		bus.WriteByteToReg(ADDRESS, OLATA, index)
-		time.Sleep(250 * time.Millisecond)
+//		time.Sleep(250 * time.Millisecond)
 	}
 
 }
