@@ -21,4 +21,6 @@ func main() {
 	table.init()
 	log.Println("i2c...")
 	table.i2c()
+	log.Println("let's read i2c...")
+	table.loop()
 }
