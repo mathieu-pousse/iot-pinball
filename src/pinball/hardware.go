@@ -9,10 +9,10 @@ import (
 )
 
 const (
-	ADDRESS = "0x20"
-	IODIRA  = "0x00"
-	OLATA   = "0x14"
-	GPPUA   = "0x0C"
+	ADDRESS = 0x20
+	IODIRA  = 0x00
+	OLATA   = 0x14
+	GPPUA   = 0x0C
 )
 
 type Hardware struct {
@@ -36,8 +36,7 @@ func (hardware *Hardware) i2c() {
 	bus.WriteByteToReg(ADDRESS, GPPUA, 0x80)
 
 	for index := 0; index < 7; index++ {
-		bus.WriteByteToReg(ADDRESS, OLATA, i)
-		ADDRESS $OLATA 0x0$i
+		bus.WriteByteToReg(ADDRESS, OLATA, index)
 		time.Sleep(250 * time.Millisecond)
 	}
 

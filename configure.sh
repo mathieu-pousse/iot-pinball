@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export GOPATH=$(cd $(dirname $0); pwd)
+export GOPATH=$(cd $(dirname ${BASH_SOURCE[0]}); pwd)
  
 echo "GOPATH=${GOPATH}"
 
