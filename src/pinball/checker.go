@@ -2,7 +2,8 @@ package main
 
 import (
 	"log"
-	"os/user"
+	"os/exec"
+	"strings"
 )
 
 func CheckSystem() {
@@ -12,11 +13,13 @@ func CheckSystem() {
 
 func checkUID() {
 	log.Printf("Checking user id...")
-	var user, err = user.Current()
+	cmd := exec.Command("id", "-un")
+	output, err := cmd.Output()
+
 	if err != nil {
-		log.Fatal("Can check if we are root")
+		log.Fatal("Cannot determine user id, assume not root", err)
 	}
-	if user.Uid != "0" {
-		log.Fatalf("Must be root to interact properly with hardware (currently %s)", user.Name)
+	if strings.TrimSpace(string(output)) != "root" {
+		log.Fatalf("not running as root but as %s", output)
 	}
 }

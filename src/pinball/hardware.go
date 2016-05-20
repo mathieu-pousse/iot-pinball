@@ -30,11 +30,19 @@ const (
 )
 
 type Hardware struct {
+	bus embd.I2CBus
 }
 
 var table = Hardware{}
 
 func (hardware *Hardware) init() {
+	if hardware.bus != nil {
+		return
+	}
+	hardware.bus = embd.NewI2CBus(1)
+}
+
+func (hardware *Hardware) OnBoardLeds() {
 	log.Println("Configuring hardware...")
 	defer embd.CloseLED()
 	for index := 0; index < 20; index++ {
@@ -45,29 +53,25 @@ func (hardware *Hardware) init() {
 	time.Sleep(2500 * time.Millisecond)
 }
 
-func (hardware *Hardware) i2c() {
-	bus := embd.NewI2CBus(1)
-	defer bus.Close()
-	bus.WriteByteToReg(ADDRESS, IODIRA, 0x80)
-	bus.WriteByteToReg(ADDRESS, GPPUA, 0x80)
-	bus.WriteByteToReg(ADDRESS, OLATA, 0x00)
+func (hardware *Hardware) I2CLeds() {
+	hardware.bus.WriteByteToReg(ADDRESS, IODIRA, 0x80)
+	hardware.bus.WriteByteToReg(ADDRESS, GPPUA, 0x80)
+	hardware.bus.WriteByteToReg(ADDRESS, OLATA, 0x00)
 	time.Sleep(250 * time.Millisecond)
 	var index byte = 0
 	for ; index < 7; index++ {
-		bus.WriteByteToReg(ADDRESS, OLATA, index)
+		hardware.bus.WriteByteToReg(ADDRESS, OLATA, index)
 		time.Sleep(250 * time.Millisecond)
 	}
 }
 
 func (hardware *Hardware) loop() {
-	bus := embd.NewI2CBus(1)
-	defer bus.Close()
-	bus.WriteByteToReg(ADDRESS, IODIRA, 0x80) // input for A7
-	bus.WriteByteToReg(ADDRESS, GPPUA, 0x80)  // enable pull up resistor for A7
+	hardware.bus.WriteByteToReg(ADDRESS, IODIRA, 0x80) // input for A7
+	hardware.bus.WriteByteToReg(ADDRESS, GPPUA, 0x80)  // enable pull up resistor for A7
 	counter := 5
 	for counter > 0 {
-		value, err := bus.ReadByteFromReg(ADDRESS, GPIOA)
-		if err != nill {
+		value, err := hardware.bus.ReadByteFromReg(ADDRESS, GPIOA)
+		if err != nil {
 			log.Fatal("error while reading")
 		}
 		if value&0x80 != 0 {
@@ -76,8 +80,4 @@ func (hardware *Hardware) loop() {
 		}
 		time.Sleep(10 * time.Millisecond)
 	}
-}
-
-func (hardware *Hardware) direction(chip byte) {
-
 }
