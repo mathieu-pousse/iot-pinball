@@ -24,6 +24,7 @@ build:
 	$(GOARGS) $(GOBUILD) -o $(TARGET) $(TOPLEVEL_PKG)
 
 launch: build
+	scp shell/clean.sh $(RPI_USER)@$(RPI):~/clean.sh
 	ssh $(RPI_USER)@$(RPI) "sudo ./clean.sh"
 	scp $(TARGET) $(RPI_USER)@$(RPI):~/$(BINARY)
 	ssh $(RPI_USER)@$(RPI) "sudo ./$(BINARY)"

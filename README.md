@@ -1,3 +1,13 @@
+#
+
+# Build
+
+```$ make```
+
+In order to deploy, add in ```/etc/hosts```` an entry named ```rpi``` pointing to the ip of your RPI. Add your public key to the authorized keys of user pi on the rpi
+
+```$ make launch```
+
 # Documentation
 
  * MCP23017: http://ww1.microchip.com/downloads/en/DeviceDoc/21952b.pdf
