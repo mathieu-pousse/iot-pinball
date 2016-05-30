@@ -1,4 +1,4 @@
-package main
+package hardware
 
 import (
 	"log"
@@ -41,8 +41,6 @@ type Hardware struct {
 	gpio21 embd.DigitalPin
 	wg     sync.WaitGroup
 }
-
-var table = Hardware{}
 
 func (hardware *Hardware) init() {
 	if hardware.bus != nil {
