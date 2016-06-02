@@ -9,7 +9,7 @@ func SolenoidDelay() time.Duration {
 	return 1 * time.Millisecond
 }
 
-type EventHandler interface {
+type InputEventHandler interface {
 	Handle(event InputEvent)
 }
 
@@ -39,9 +39,9 @@ type PulseWhilePressed struct {
 }
 
 func (eh PulseWhilePressed) Handle(event InputEvent) {
-	if event.Direction == "rising" {
+	if event.Direction == Rising {
 		log.Printf("setting %s to 1", eh.OutputId)
-	} else if event.Direction == "falling" {
+	} else if event.Direction == Falling {
 		log.Printf("setting %s to 0", eh.OutputId)
 	}
 }

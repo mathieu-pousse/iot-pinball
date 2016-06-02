@@ -12,9 +12,7 @@ type GlobalConfiguration struct {
 }
 
 
-var global = GlobalConfiguration{
-
-}
+var global = GlobalConfiguration{}
 
 
 func parseArguments() {
@@ -24,7 +22,7 @@ func parseArguments() {
 
 	flag.Parse()
 
-	log.Printf("parsed arguments: %+v", global)
+	log.Printf("parsed arguments: %+v\n", global)
 }
 
 func main() {
@@ -35,6 +33,7 @@ func main() {
 	}
 
 	LoadConfiguration(global.File)
+	pinball := Pinball{}
 	pinball.initialize()
 	pinball.eventLoop()
 	pinball.release()

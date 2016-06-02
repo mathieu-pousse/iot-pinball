@@ -21,6 +21,10 @@ all: build
 
 local:
 	$(eval GOARGS = )
+	$(eval BIN_ARGS = "--no-check --no-hardware" )
+
+run: build
+	$(TARGET) $(BIN_ARGS)
 
 build:
 	mkdir -p $(DIST)

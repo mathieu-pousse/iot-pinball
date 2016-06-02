@@ -7,13 +7,11 @@ import (
 )
 
 type Pinball struct {
-	Hardware      *hardware.Hardware
-	Inputs        []hardware.Input
-	inputsChannel chan hardware.Event
-	outputsChannel chan hardware.Event
+	Hardware       *hardware.Hardware
+	Inputs         []hardware.Input
+	inputsChannel  chan hardware.InputEvent
+	outputsChannel chan hardware.OutputEvent
 }
-
-var pinball = NewPinball()
 
 func NewPinball() *Pinball {
 	p := Pinball{}
@@ -24,7 +22,7 @@ func NewPinball() *Pinball {
 func (pinball *Pinball) initialize() {
 	pinball.Hardware = new(hardware.Hardware)
 	pinball.createInputs()
-	pinball.inputsChannel = make(chan hardware.Event)
+	pinball.inputsChannel = make(chan hardware.InputEvent)
 	if global.NoHardware {
 		go listenToKeyboard(pinball.inputsChannel)
 	} else {
@@ -41,25 +39,29 @@ func (pinball *Pinball) eventLoop() {
 		select {
 		//case p := <-pointsChan:
 		//	g.addPoints(p)
-		case e := <-keyboardEventsChan:
-			log.Printf("got %+v", e)
-			switch e.eventType {
-			case MOVE:
-				log.Printf("move %v", e.eventType)
-				keyToDirection(e.key)
-			case END:
-				log.Printf("break %v", e.eventType)
+		case e := <-pinball.inputsChannel:
+			if e.InputId == "power" && e.Direction == hardware.Rising {
 				break eventLoop
-			default:
-				log.Printf("default %v", e.eventType)
 			}
+			pinball.dispatchInputEvent(e)
+
 		default:
 
 		}
 
-		log.Printf("event loop is over")
 	}
+	log.Printf("event loop is over")
+}
 
+func (pinball *Pinball) dispatchInputEvent(e hardware.InputEvent) {
+	log.Printf("### InputEvent %+v\n", e)
+	for _, input := range pinball.Inputs {
+		if input.Name == e.InputId {
+			input.OnEvent(e)
+			return
+		}
+	}
+	log.Printf("no body care about this event on %s", e.InputId)
 }
 
 func (pinball *Pinball) release() {
@@ -67,13 +69,13 @@ func (pinball *Pinball) release() {
 }
 
 func (pinball *Pinball) createInputs() {
-	pinball.createInput("left flipper", hardware.PulseWhilePressed{OutputId: "leftFlipper"})
-	pinball.createInput("right flipper", hardware.PulseWhilePressed{OutputId: "rightFlipper"})
-	pinball.createInput("left inlane", hardware.Score{Plus: 1000})
-	pinball.createInput("right inlane", hardware.Score{Plus: 1000})
+	pinball.createInput("leftFlipper", hardware.PulseWhilePressed{OutputId: "leftFlipper"})
+	pinball.createInput("rightFlipper", hardware.PulseWhilePressed{OutputId: "rightFlipper"})
+	pinball.createInput("leftInlane", hardware.Score{Plus: 1000})
+	pinball.createInput("rightInlane", hardware.Score{Plus: 1000})
 
-	pinball.createInput("left outlane")  // replay before 30 seconds
-	pinball.createInput("right outlane") // replay before 30 seconds
+	pinball.createInput("leftOutlane")  // replay before 30 seconds
+	pinball.createInput("rightOutlane") // replay before 30 seconds
 	pinball.createInput("drain") // replay before 30 seconds
 
 	pinball.createInput("bumper1",
@@ -92,7 +94,7 @@ func (pinball *Pinball) createInputs() {
 
 }
 
-func (pinball *Pinball) createInput(name string, ehs ...hardware.EventHandler) {
+func (pinball *Pinball) createInput(name string, ehs ...hardware.InputEventHandler) {
 	input := hardware.Input{Name: name}
 	for _, eh := range ehs {
 		input.AddEventHandler(eh)

@@ -7,14 +7,14 @@ type OutputEvent struct {
 
 type Output struct {
 	Name      string
-	listeners []EventHandler
+	listeners []OutputEventHandler
 }
 
 func (input *Output) Configure() {
 
 }
 
-func (input *Output) AddEventHandler(eh EventHandler) {
+func (input *Output) AddEventHandler(eh OutputEventHandler) {
 	input.listeners = append(input.listeners, eh)
 }
 

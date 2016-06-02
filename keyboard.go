@@ -2,75 +2,56 @@ package main
 
 import (
 	"github.com/nsf/termbox-go"
+	"pinball/hardware"
+	"time"
 	"log"
 )
 
-type keyboardEventType int
-
-const (
-	RIGHT direction = 1 + iota
-	LEFT
-	UP
-	DOWN
-)
-
-type direction int
-
-const (
-	MOVE keyboardEventType = 1 + iota
-	RETRY
-	END
-)
-
-type keyboardEvent struct {
-	eventType keyboardEventType
-	key       termbox.Key
-}
-
-func keyToDirection(k termbox.Key) direction {
-	switch k {
+func findInputIdForKey(key termbox.Key) string {
+	switch key {
 	case termbox.KeyArrowLeft:
-		return LEFT
-	case termbox.KeyArrowDown:
-		return DOWN
+		return "leftFlipper"
 	case termbox.KeyArrowRight:
-		return RIGHT
-	case termbox.KeyArrowUp:
-		return UP
+		return "rightFlipper"
+	case termbox.KeyEsc:
+		return "power"
 	default:
-		return 0
+		return ""
 	}
 }
 
-func listenToKeyboard(evChan chan keyboardEvent) {
-
+func listenToKeyboard(evChan chan hardware.InputEvent) {
 	if err := termbox.Init(); err != nil {
 		panic(err)
 	}
 	termbox.SetInputMode(termbox.InputEsc)
 
+	var previous *termbox.Key
+
 	for {
-		log.Printf("waiting for intput")
 		switch ev := termbox.PollEvent(); ev.Type {
 		case termbox.EventKey:
-			switch ev.Key {
-			case termbox.KeyArrowLeft:
-				evChan <- keyboardEvent{eventType: MOVE, key: ev.Key}
-			case termbox.KeyArrowDown:
-				evChan <- keyboardEvent{eventType: MOVE, key: ev.Key}
-			case termbox.KeyArrowRight:
-				evChan <- keyboardEvent{eventType: MOVE, key: ev.Key}
-			case termbox.KeyArrowUp:
-				evChan <- keyboardEvent{eventType: MOVE, key: ev.Key}
-			case termbox.KeyEsc:
-				evChan <- keyboardEvent{eventType: END, key: ev.Key}
-			default:
-				if ev.Ch == 'r' {
-					evChan <- keyboardEvent{eventType: RETRY, key: ev.Key}
+			direction := hardware.Rising
+			if previous != nil {
+				if previous == &ev.Key {
+					// already up
+					direction = hardware.High
+				} else {
+					//  mark previous as falling
+					evChan <- hardware.InputEvent{InputId: findInputIdForKey(*previous), Direction: hardware.Falling}
 				}
+				previous = nil
 			}
+
+			if inputId := findInputIdForKey(ev.Key); inputId != "" {
+				evChan <- hardware.InputEvent{InputId: inputId, Direction: direction}
+				previous = &ev.Key
+			}
+
 		case termbox.EventError:
 			panic(ev.Err)
 		}
+		log.Printf("waiting...")
+		time.Sleep(10)
 	}
 }
