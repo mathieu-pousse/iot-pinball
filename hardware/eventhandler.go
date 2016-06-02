@@ -10,14 +10,14 @@ func SolenoidDelay() time.Duration {
 }
 
 type EventHandler interface {
-	Handle(event Event)
+	Handle(event InputEvent)
 }
 
 type Score struct {
 	Plus int
 }
 
-func (eh Score) Handle(event Event) {
+func (eh Score) Handle(event InputEvent) {
 	log.Printf("score +%v", eh.Plus)
 }
 
@@ -26,7 +26,7 @@ type PulseOnOutput struct {
 	Delay    time.Duration
 }
 
-func (eh PulseOnOutput) Handle(event Event) {
+func (eh PulseOnOutput) Handle(event InputEvent) {
 	log.Printf("setting %s to 1", eh.OutputId)
 	go func() {
 		time.Sleep(eh.Delay)
@@ -38,10 +38,10 @@ type PulseWhilePressed struct {
 	OutputId string
 }
 
-func (eh PulseWhilePressed) Handle(event Event) {
-	if event.direction == "rising" {
+func (eh PulseWhilePressed) Handle(event InputEvent) {
+	if event.Direction == "rising" {
 		log.Printf("setting %s to 1", eh.OutputId)
-	} else if event.direction == "falling" {
+	} else if event.Direction == "falling" {
 		log.Printf("setting %s to 0", eh.OutputId)
 	}
 }

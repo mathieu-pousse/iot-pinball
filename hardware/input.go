@@ -1,7 +1,8 @@
 package hardware
 
-type Event struct {
-	direction string
+type InputEvent struct {
+	Direction string
+	InputId string
 }
 
 type Input struct {
@@ -21,7 +22,7 @@ func (input *Input) Initialize() {
 
 }
 
-func (input *Input) OnEvent(event Event) {
+func (input *Input) OnEvent(event InputEvent) {
 	for _, eh := range input.listeners {
 		eh.Handle(event)
 	}

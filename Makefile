@@ -19,6 +19,9 @@ RPI_USER?=pi
 RPI=rpi
 all: build
 
+local:
+	$(eval GOARGS = )
+
 build:
 	mkdir -p $(DIST)
 	$(GOARGS) $(GOBUILD) -o $(TARGET) $(TOPLEVEL_PKG)
