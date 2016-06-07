@@ -1,57 +1,49 @@
 package main
 
 import (
-	"github.com/nsf/termbox-go"
 	"pinball/hardware"
-	"time"
 	"log"
+	"github.com/MarinX/keylogger"
 )
 
-func findInputIdForKey(key termbox.Key) string {
-	switch key {
-	case termbox.KeyArrowLeft:
-		return "leftFlipper"
-	case termbox.KeyArrowRight:
-		return "rightFlipper"
-	case termbox.KeyEsc:
-		return "power"
-	default:
-		return ""
-	}
+func findInputForKeyCode(key uint16) string {
+
 }
 
-func listenToKeyboard(evChan chan hardware.InputEvent) {
-	if err := termbox.Init(); err != nil {
-		panic(err)
+func inputEventLoop(evChan chan hardware.InputEvent) {
+	devs, err := keylogger.NewDevices()
+	if err != nil {
+		log.Fatal(err)
+		return
 	}
-	termbox.SetInputMode(termbox.InputEsc)
-
-	var previous *termbox.Key
-
-	for {
-		switch ev := termbox.PollEvent(); ev.Type {
-		case termbox.EventKey:
-			direction := hardware.Rising
-			if previous != nil {
-				if previous == &ev.Key {
-					// already up
-					direction = hardware.High
-				} else {
-					//  mark previous as falling
-					evChan <- hardware.InputEvent{InputId: findInputIdForKey(*previous), Direction: hardware.Falling}
-				}
-				previous = nil
+	//for _, val := range devs {
+	//	fmt.Println("Id->", val.Id, "Device->", val.Name)
+	//}
+	rd := keylogger.NewKeyLogger(devs[4])
+	in, err := rd.Read()
+	if err != nil {
+		log.Fatalf("oops %v", err)
+		return
+	}
+	for i := range in {
+		//listen only key stroke event
+		if i.Type == keylogger.EV_KEY {
+			log.Printf("key %sv %v", i.Code, i.Value)
+			key := findInputForKeyCode(i.Code)
+			if key == nil {
+				continue
+			}
+			switch i.Value {
+			case 0:
+				evChan <- hardware.InputEvent{InputId:key, Direction: hardware.Falling}
+			case 1:
+				evChan <- hardware.InputEvent{InputId:key, Direction: hardware.Rising}
+				break
+			case 2:
+				evChan <- hardware.InputEvent{InputId:key, Direction: hardware.Rising}
+				break
 			}
 
-			if inputId := findInputIdForKey(ev.Key); inputId != "" {
-				evChan <- hardware.InputEvent{InputId: inputId, Direction: direction}
-				previous = &ev.Key
-			}
-
-		case termbox.EventError:
-			panic(ev.Err)
 		}
-		log.Printf("waiting...")
-		time.Sleep(10)
 	}
 }

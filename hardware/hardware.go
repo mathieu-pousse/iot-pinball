@@ -102,7 +102,7 @@ func (hardware *Hardware) wInterrupt() {
 		log.Println("interrupted")
 		value, _ := hardware.bus.ReadByteFromReg(ADDRESS, GPIOA)
 
-		log.Printf("Got a %v !", value&0x80 != 0)
+		log.Printf("Got a %v !\n", value&0x80 != 0)
 		if value&0x80 != 0 {
 			hardware.bus.WriteByteToReg(ADDRESS, OLATA, 0x07)
 			//		hardware.bus.WriteByteToReg(ADDRESS, OLATA, 0x07)
@@ -114,18 +114,18 @@ func (hardware *Hardware) wInterrupt() {
 	})
 
 	log.Print("ready to wait")
-	log.Printf("over %v", <-quit)
+	log.Printf("over %v\n", <-quit)
 }
 
 func (hardware *Hardware) sequential() {
-	log.Printf("reading gpio21")
+	log.Printf("reading gpio21\n")
 	count := 5
 	for count > 0 {
 		v, _ := hardware.gpio21.Read()
 		//log.Printf("got %v %v", v, err)
 		if v != 1 {
 			value, _ := hardware.bus.ReadByteFromReg(ADDRESS, GPIOA)
-			log.Printf("got %v %v", v, value)
+			log.Printf("got %v %v\n", v, value)
 			count -= 1
 		}
 	}

@@ -24,7 +24,7 @@ func (pinball *Pinball) initialize() {
 	pinball.createInputs()
 	pinball.inputsChannel = make(chan hardware.InputEvent)
 	if global.NoHardware {
-		go listenToKeyboard(pinball.inputsChannel)
+		go inputEventLoop(pinball.inputsChannel)
 	} else {
 		//go handleWithActualInputs
 		log.Panic("not yet implemented")
@@ -50,7 +50,7 @@ func (pinball *Pinball) eventLoop() {
 		}
 
 	}
-	log.Printf("event loop is over")
+	log.Printf("event loop is over\n")
 }
 
 func (pinball *Pinball) dispatchInputEvent(e hardware.InputEvent) {
@@ -61,7 +61,7 @@ func (pinball *Pinball) dispatchInputEvent(e hardware.InputEvent) {
 			return
 		}
 	}
-	log.Printf("no body care about this event on %s", e.InputId)
+	log.Printf("no body care about this event on %s\n", e.InputId)
 }
 
 func (pinball *Pinball) release() {

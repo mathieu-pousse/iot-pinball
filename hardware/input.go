@@ -34,8 +34,12 @@ func (input *Input) Initialize() {
 }
 
 func (input *Input) OnEvent(event InputEvent) {
-	log.Printf("Dispatching event to listeners of %s", event.InputId)
+	log.Printf("Dispatching event to listeners of %s\n", event.InputId)
 	for _, eh := range input.listeners {
 		eh.Handle(event)
 	}
+}
+
+type InputEventProducer interface {
+	produce(inputEventChannel chan InputEvent)
 }

@@ -5,5 +5,5 @@ import (
 )
 
 func LoadConfiguration(file string) {
-	log.Printf("Loading table configuration from %s", file)
+	log.Printf("Loading table configuration from %s\n", file)
 }

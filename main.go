@@ -6,14 +6,12 @@ import (
 )
 
 type GlobalConfiguration struct {
-	File string
-	NoCheck bool
+	File       string
+	NoCheck    bool
 	NoHardware bool
 }
 
-
 var global = GlobalConfiguration{}
-
 
 func parseArguments() {
 	flag.BoolVar(&global.NoCheck, "no-check", false, "do not perform start up check-up")
@@ -26,6 +24,7 @@ func parseArguments() {
 }
 
 func main() {
+
 	parseArguments()
 
 	if !global.NoCheck {

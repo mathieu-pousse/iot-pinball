@@ -18,7 +18,7 @@ type Score struct {
 }
 
 func (eh Score) Handle(event InputEvent) {
-	log.Printf("score +%v", eh.Plus)
+	log.Printf("score +%v\n", eh.Plus)
 }
 
 type PulseOnOutput struct {
@@ -27,10 +27,10 @@ type PulseOnOutput struct {
 }
 
 func (eh PulseOnOutput) Handle(event InputEvent) {
-	log.Printf("setting %s to 1", eh.OutputId)
+	log.Printf("setting %s to 1\n", eh.OutputId)
 	go func() {
 		time.Sleep(eh.Delay)
-		log.Printf("setting %s to 0", eh.OutputId)
+		log.Printf("setting %s to 0\n", eh.OutputId)
 	}()
 }
 
@@ -40,8 +40,8 @@ type PulseWhilePressed struct {
 
 func (eh PulseWhilePressed) Handle(event InputEvent) {
 	if event.Direction == Rising {
-		log.Printf("setting %s to 1", eh.OutputId)
+		log.Printf("setting %s to 1\n", eh.OutputId)
 	} else if event.Direction == Falling {
-		log.Printf("setting %s to 0", eh.OutputId)
+		log.Printf("setting %s to 0\n", eh.OutputId)
 	}
 }
