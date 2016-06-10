@@ -15,5 +15,6 @@ In order to deploy, add in ```/etc/hosts```` an entry named ```rpi``` pointing t
  * GPIO for rpi through embd: https://godoc.org/github.com/kidoman/embd
  * Electronic: http://www.sonelec-musique.com/
  * http://www.ipdb.org/glossary.php
+ * http://www.pinrepair.com/em/index3.htm#pops
 
 
